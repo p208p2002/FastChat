@@ -20,20 +20,20 @@ class InvalidScoreLogitsProcessor(LogitsProcessor):
 invalid_score_processor = InvalidScoreLogitsProcessor()
 
 
-# def process_response(response):
-#     response = response.strip()
-#     response = response.replace("[[训练时间]]", "2023年")
-#     punkts = [
-#         [",", "，"],
-#         ["!", "！"],
-#         [":", "："],
-#         [";", "；"],
-#         ["\?", "？"],
-#     ]
-#     for item in punkts:
-#         response = re.sub(r"([\u4e00-\u9fff])%s" % item[0], r"\1%s" % item[1], response)
-#         response = re.sub(r"%s([\u4e00-\u9fff])" % item[0], r"%s\1" % item[1], response)
-#     return response
+def process_response(response):
+    response = response.strip()
+    response = response.replace("[[训练时间]]", "2023年")
+    punkts = [
+        [",", "，"],
+        ["!", "！"],
+        [":", "："],
+        [";", "；"],
+        ["\?", "？"],
+    ]
+    for item in punkts:
+        response = re.sub(r"([\u4e00-\u9fff])%s" % item[0], r"\1%s" % item[1], response)
+        response = re.sub(r"%s([\u4e00-\u9fff])" % item[0], r"%s\1" % item[1], response)
+    return response
 
 
 def recover_message_list(prompt):
@@ -84,9 +84,14 @@ def generate_stream_chatglm(
 
     if "chatglm3" in model_type:
         message_list = recover_message_list(prompt)
-        inputs = tokenizer.build_chat_input(
-            query=message_list[-1]["content"], history=message_list[:-1], role="user"
-        ).to(model.device)
+        # inputs = tokenizer.build_chat_input(
+        #     query=message_list[-1]["content"], history=message_list[:-1], role="user"
+        # ).to(model.device)
+        inputs = tokenizer.apply_chat_template(message_list,add_generation_prompt=True,tokenize=True,return_tensors="pt")
+        inputs = inputs.to(model.device)
+        inputs = {
+            "input_ids":inputs
+        }
     else:
         inputs = tokenizer([prompt], return_tensors="pt").to(model.device)
     input_echo_len = len(inputs["input_ids"][0])
@@ -116,7 +121,7 @@ def generate_stream_chatglm(
             finish_reason = "stop"
 
         response = tokenizer.decode(output_ids)
-        # response = process_response(response)
+        response = process_response(response)
 
         yield {
             "text": response,
