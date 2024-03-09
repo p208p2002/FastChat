@@ -20,20 +20,20 @@ class InvalidScoreLogitsProcessor(LogitsProcessor):
 invalid_score_processor = InvalidScoreLogitsProcessor()
 
 
-def process_response(response):
-    response = response.strip()
-    response = response.replace("[[训练时间]]", "2023年")
-    punkts = [
-        [",", "，"],
-        ["!", "！"],
-        [":", "："],
-        [";", "；"],
-        ["\?", "？"],
-    ]
-    for item in punkts:
-        response = re.sub(r"([\u4e00-\u9fff])%s" % item[0], r"\1%s" % item[1], response)
-        response = re.sub(r"%s([\u4e00-\u9fff])" % item[0], r"%s\1" % item[1], response)
-    return response
+# def process_response(response):
+#     response = response.strip()
+#     response = response.replace("[[训练时间]]", "2023年")
+#     punkts = [
+#         [",", "，"],
+#         ["!", "！"],
+#         [":", "："],
+#         [";", "；"],
+#         ["\?", "？"],
+#     ]
+#     for item in punkts:
+#         response = re.sub(r"([\u4e00-\u9fff])%s" % item[0], r"\1%s" % item[1], response)
+#         response = re.sub(r"%s([\u4e00-\u9fff])" % item[0], r"%s\1" % item[1], response)
+#     return response
 
 
 def recover_message_list(prompt):
@@ -116,7 +116,7 @@ def generate_stream_chatglm(
             finish_reason = "stop"
 
         response = tokenizer.decode(output_ids)
-        response = process_response(response)
+        # response = process_response(response)
 
         yield {
             "text": response,
