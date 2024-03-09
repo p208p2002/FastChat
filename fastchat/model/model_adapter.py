@@ -838,6 +838,7 @@ class ChatGLMAdapter(BaseModelAdapter):
         model = AutoModel.from_pretrained(
             model_path, trust_remote_code=True, **from_pretrained_kwargs
         )
+        model.config = AutoConfig.from_pretrained(model_path, trust_remote_code=True)
         model.eval()
         return model, tokenizer
 
