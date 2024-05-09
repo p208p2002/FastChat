@@ -97,7 +97,7 @@ def generate_stream_chatglm(
     input_echo_len = len(inputs["input_ids"][0])
 
     gen_kwargs = {
-        "max_new_tokens": 512,
+        "max_new_tokens": max_new_tokens,
         "do_sample": True if temperature > 1e-4 else False,
         "temperature": temperature if temperature > 1e-4 else None,
         "top_p": top_p,
